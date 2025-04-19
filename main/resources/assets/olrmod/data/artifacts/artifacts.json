@@ -1,0 +1,14 @@
+[
+  {
+    "itemId": "visualmod:artifact_gravi",
+    "effects": ["GRAVITATIONAL"],
+    "spawnChance": 25,
+    "weightBonus": 5.0
+  },
+  {
+    "itemId": "visualmod:artifact_fireeye",
+    "effects": ["CHEMICAL", "RADIATION"],
+    "spawnChance": 10,
+    "weightBonus": 2.5
+  }
+]
