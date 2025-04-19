@@ -2,9 +2,9 @@ package com.olrmod.artifacts;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.olrmod.effects.EffectStageManager.EffectType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.io.InputStreamReader;
@@ -29,18 +29,19 @@ public class ArtifactEffectRegistry {
         }
     }
 
-    public static List<ArtifactData> getArtifacts() {
-        return artifacts;
-    }
-
     public static Optional<ArtifactData> getByItem(ItemStack stack) {
-        Item item = stack.getItem();
+        ResourceLocation id = stack.getItem().getRegistryName();
+        if (id == null) return Optional.empty();
+
         for (ArtifactData data : artifacts) {
-            if (ForgeRegistries.ITEMS.containsKey(data.getItemId()) &&
-                ForgeRegistries.ITEMS.getValue(data.getItemId()) == item) {
+            if (id.equals(data.getItemId())) {
                 return Optional.of(data);
             }
         }
         return Optional.empty();
+    }
+
+    public static List<ArtifactData> getArtifacts() {
+        return artifacts;
     }
 }
