@@ -2,11 +2,9 @@ package com.olrmod.emission;
 
 import com.olrmod.effects.EffectStageManager;
 import com.olrmod.effects.EffectStageManager.EffectType;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -51,13 +49,9 @@ public class EmissionManager {
 
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
 
-        if (!isInShelter(player)) {
+        if (!SafeZoneManager.isInSafeZone(player)) {
             EffectStageManager.addEffect(player, EffectType.RADIATION, 4);
         }
-    }
-
-    private boolean isInShelter(EntityPlayerMP player) {
-        return player.world.getBlockState(player.getPosition().up()).getMaterial().isOpaque();
     }
 
     private void broadcast(String msg) {
