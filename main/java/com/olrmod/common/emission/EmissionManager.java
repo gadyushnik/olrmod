@@ -2,49 +2,58 @@ package com.olrmod.emission;
 
 import com.olrmod.effects.EffectStageManager;
 import com.olrmod.effects.EffectStageManager.EffectType;
+import com.olrmod.anomaly.AnomalySpawner;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 public class EmissionManager {
-    private static int timer = 0;
-    private static boolean active = false;
-    private static final int INTERVAL = 20 * 60 * 10;
-    private static final int DURATION = 20 * 30;
+    private static final int INTERVAL_TICKS = 20 * 60 * 10; // 10 мин
+    private static final int DURATION_TICKS = 20 * 30; // 30 сек
+
+    private static int tickCounter = 0;
+    private static boolean emissionActive = false;
 
     @SubscribeEvent
-    public void onTick(TickEvent.ServerTickEvent event) {
+    public void onServerTick(TickEvent.ServerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
-        timer++;
+        tickCounter++;
 
-        if (!active && timer >= INTERVAL) {
+        if (!emissionActive && tickCounter >= INTERVAL_TICKS) {
             startEmission();
         }
 
-        if (active && timer >= INTERVAL + DURATION) {
+        if (emissionActive && tickCounter >= INTERVAL_TICKS + DURATION_TICKS) {
             stopEmission();
         }
     }
 
     private void startEmission() {
-        active = true;
-        timer = INTERVAL;
+        emissionActive = true;
+        tickCounter = INTERVAL_TICKS;
+
         broadcast("§c[Зона] Начался выброс! Срочно найдите укрытие!");
     }
 
     private void stopEmission() {
-        active = false;
-        timer = 0;
+        emissionActive = false;
+        tickCounter = 0;
+
         broadcast("§a[Зона] Выброс завершён.");
+
+        World world = FMLCommonHandler.instance().getMinecraftServerInstance().getWorld(0);
+        AnomalySpawner.clearOldAnomalies(world);
+        AnomalySpawner.spawnNewAnomalies(world);
     }
 
     @SubscribeEvent
     public void onPlayerTick(LivingEvent.LivingUpdateEvent event) {
-        if (!active) return;
+        if (!emissionActive) return;
         if (!(event.getEntityLiving() instanceof EntityPlayerMP)) return;
 
         EntityPlayerMP player = (EntityPlayerMP) event.getEntityLiving();
