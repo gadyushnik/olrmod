@@ -1,14 +1,12 @@
 [
   {
-    "itemId": "visualmod:artifact_gravi",
-    "effects": ["GRAVITATIONAL"],
-    "spawnChance": 25,
-    "weightBonus": 5.0
-  },
-  {
-    "itemId": "visualmod:artifact_fireeye",
-    "effects": ["CHEMICAL", "RADIATION"],
-    "spawnChance": 10,
-    "weightBonus": 2.5
+    "artifactId": "toad_eye",
+    "itemId": "minecraft:flint",
+    "effects": [
+      { "type": "CHEMICAL", "amount": 2 },
+      { "type": "RADIATION", "amount": -1 }
+    ],
+    "spawnChance": 15,
+    "weightBonus": 0.0
   }
 ]
