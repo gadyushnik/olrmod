@@ -22,6 +22,7 @@ public class StalkerMod {
         // Регистрируем обработчики
         MinecraftForge.EVENT_BUS.register(new EmissionManager());
         MinecraftForge.EVENT_BUS.register(new AnomalyLogicHandler());
+        MinecraftForge.EVENT_BUS.register(new EffectDamageHandler());
         MinecraftForge.EVENT_BUS.register(new ArtifactEffectApplier());
         MinecraftForge.EVENT_BUS.register(new ArtifactTooltipHandler());
 
