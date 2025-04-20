@@ -1,0 +1,10 @@
+[
+  {
+    "itemId": "visualmod:stalker_suit",
+    "resistances": {
+      "RADIATION": 0.8,
+      "CHEMICAL": 0.6,
+      "GRAVITATIONAL": 0.4
+    }
+  }
+]
