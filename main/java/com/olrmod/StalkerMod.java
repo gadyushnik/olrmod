@@ -1,6 +1,13 @@
 package com.olrmod;
 
+import com.olrmod.anomaly.AnomalyLogicHandler;
+import com.olrmod.artifacts.ArtifactEffectApplier;
 import com.olrmod.artifacts.ArtifactEffectRegistry;
+import com.olrmod.artifacts.ArtifactTooltipHandler;
+import com.olrmod.emission.EmissionManager;
+import com.olrmod.weight.WeightManager;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -12,7 +19,14 @@ public class StalkerMod {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        ModEventRegistrar.register();
+        // Регистрируем обработчики
+        MinecraftForge.EVENT_BUS.register(new EmissionManager());
+        MinecraftForge.EVENT_BUS.register(new AnomalyLogicHandler());
+        MinecraftForge.EVENT_BUS.register(new ArtifactEffectApplier());
+        MinecraftForge.EVENT_BUS.register(new ArtifactTooltipHandler());
+
+        // Загружаем JSON-конфиги
         ArtifactEffectRegistry.loadArtifacts();
+        WeightManager.loadWeights(Loader.instance().getConfigDir());
     }
 }
