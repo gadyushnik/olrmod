@@ -1,0 +1,12 @@
+[
+  {
+    "artifactId": "toad_eye",
+    "itemId": "minecraft:flint",
+    "effects": [
+      { "type": "CHEMICAL", "amount": 2 },
+      { "type": "RADIATION", "amount": -1 }
+    ],
+    "spawnChance": 15,
+    "weightBonus": 0.0
+  }
+]
