@@ -1,0 +1,9 @@
+{
+  "weightLow": 30,
+  "weightNormal": 40,
+  "weightFull": 50,
+  "itemWeights": {
+    "minecraft:flint": 0.5,
+    "minecraft:slime_ball": 0.1
+  }
+}
