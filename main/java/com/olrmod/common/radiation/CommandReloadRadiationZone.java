@@ -20,7 +20,7 @@ public class CommandReloadRadiationZone extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/reloadradiationzone — перегенерирует радиацию в текущем чанке";
+        return "/reloadradiationzone — перегенерация зон в текущем чанке";
     }
 
     @Override
@@ -29,26 +29,27 @@ public class CommandReloadRadiationZone extends CommandBase {
 
         EntityPlayerMP player = (EntityPlayerMP) sender;
         BlockPos pos = player.getPosition();
-        World world = player.world;
         ChunkPos chunkPos = new ChunkPos(pos);
+        World world = player.world;
+        Biome biome = world.getBiome(pos);
+        String biomeName = biome.getRegistryName().getPath();
         Random rand = new Random();
 
-        Biome biome = world.getBiome(pos);
         RadiationZoneManager.removeZonesInChunk(chunkPos.x, chunkPos.z);
 
         for (RadiationZone.ZoneType type : RadiationZone.ZoneType.values()) {
-            RadiationSpawnConfig.SpawnSettings set = RadiationSpawnConfig.getSettings(biome, type);
-            if (set != null && rand.nextFloat() < set.chance) {
-                BlockPos p1 = new BlockPos((chunkPos.x << 4) + rand.nextInt(16), 64, (chunkPos.z << 4) + rand.nextInt(16));
-                BlockPos p2 = p1.add(3 + rand.nextInt(4), 2, 3 + rand.nextInt(4));
-                int stage = type.ordinal() + 1;
-                RadiationZone zone = new RadiationZone(p1, p2, type, stage);
-                RadiationZoneManager.addZone(zone);
-            }
+            RadiationSpawnConfig.SpawnData data = RadiationSpawnConfig.get(biomeName, type);
+            if (data == null || rand.nextFloat() > data.chance) continue;
+
+            BlockPos p1 = new BlockPos((chunkPos.x << 4) + rand.nextInt(16), 64, (chunkPos.z << 4) + rand.nextInt(16));
+            BlockPos p2 = p1.add(3 + rand.nextInt(4), 2, 3 + rand.nextInt(4));
+            int stage = type.ordinal() + 1;
+            RadiationZone zone = new RadiationZone(p1, p2, type, stage);
+            RadiationZoneManager.addZone(zone);
         }
 
         RadiationZoneManager.saveZones();
-        sender.sendMessage(new TextComponentString("Радиационные зоны в чанке обновлены."));
+        sender.sendMessage(new TextComponentString("Зоны радиации в текущем чанке обновлены."));
     }
 
     @Override
