@@ -1,41 +1,41 @@
 package com.olrmod.radiation;
 
 import com.google.gson.Gson;
-import net.minecraft.world.biome.Biome;
+import com.google.gson.reflect.TypeToken;
 import net.minecraftforge.fml.common.Loader;
 
 import java.io.*;
-import java.util.HashMap;
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public class RadiationSpawnConfig {
-    public static class SpawnSettings {
+    public static class SpawnData {
         public float chance;
         public int max;
     }
 
-    public static class BiomeSettings {
-        public Map<String, SpawnSettings> levels = new HashMap<>();
+    public static class BiomeSpawn {
+        public Map<String, SpawnData> levels;
     }
 
-    private static final Map<String, BiomeSettings> CONFIG = new HashMap<>();
+    private static final Gson GSON = new Gson();
+    private static final Map<String, BiomeSpawn> CONFIG = new HashMap<>();
 
     public static void load() {
-        File file = new File(new File(Loader.instance().getConfigDir(), "olrmod"), "radiation_spawn.json");
+        File file = new File(Loader.instance().getConfigDir(), "olrmod/radiation_spawn.json");
         if (!file.exists()) return;
 
         try (Reader reader = new FileReader(file)) {
-            Gson gson = new Gson();
-            Map<String, BiomeSettings> loaded = gson.fromJson(reader, CONFIG.getClass());
+            Type type = new TypeToken<Map<String, BiomeSpawn>>(){}.getType();
+            Map<String, BiomeSpawn> loaded = GSON.fromJson(reader, type);
             if (loaded != null) CONFIG.putAll(loaded);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static SpawnSettings getSettings(Biome biome, RadiationZone.ZoneType type) {
-        BiomeSettings settings = CONFIG.get(biome.getRegistryName().getPath());
-        if (settings == null) return null;
-        return settings.levels.get(type.name());
+    public static SpawnData get(String biome, RadiationZone.ZoneType type) {
+        BiomeSpawn spawn = CONFIG.get(biome);
+        return spawn != null ? spawn.levels.get(type.name()) : null;
     }
 }
