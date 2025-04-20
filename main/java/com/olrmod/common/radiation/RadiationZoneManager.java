@@ -8,20 +8,19 @@ import net.minecraftforge.fml.common.Loader;
 
 import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RadiationZoneManager {
-    private static final List<RadiationZone> zones = new ArrayList<>();
     private static final Gson GSON = new Gson();
+    private static final List<RadiationZone> zones = new ArrayList<>();
 
     public static void loadZones() {
-        File file = new File(new File(Loader.instance().getConfigDir(), "olrmod"), "radiation_zones.json");
+        File file = new File(Loader.instance().getConfigDir(), "olrmod/radiation_zones.json");
         if (!file.exists()) return;
 
         try (Reader reader = new FileReader(file)) {
-            Type type = new TypeToken<List<RadiationZone>>() {}.getType();
-            List<RadiationZone> loaded = GSON.fromJson(reader, type);
+            Type listType = new TypeToken<List<RadiationZone>>(){}.getType();
+            List<RadiationZone> loaded = GSON.fromJson(reader, listType);
             if (loaded != null) {
                 zones.clear();
                 zones.addAll(loaded);
@@ -32,7 +31,7 @@ public class RadiationZoneManager {
     }
 
     public static void saveZones() {
-        File file = new File(new File(Loader.instance().getConfigDir(), "olrmod"), "radiation_zones.json");
+        File file = new File(Loader.instance().getConfigDir(), "olrmod/radiation_zones.json");
         file.getParentFile().mkdirs();
         try (Writer writer = new FileWriter(file)) {
             GSON.toJson(zones, writer);
@@ -47,22 +46,16 @@ public class RadiationZoneManager {
 
     public static void removeZonesInChunk(int chunkX, int chunkZ) {
         zones.removeIf(zone -> {
-            BlockPos p1 = zone.getPos1();
-            return (p1.getX() >> 4) == chunkX && (p1.getZ() >> 4) == chunkZ;
+            BlockPos p = zone.getPos1();
+            return (p.getX() >> 4) == chunkX && (p.getZ() >> 4) == chunkZ;
         });
     }
 
     public static int getRadiationStage(EntityPlayer player) {
         BlockPos pos = player.getPosition();
         for (RadiationZone zone : zones) {
-            if (zone.isInside(pos)) {
-                return zone.getStage();
-            }
+            if (zone.isInside(pos)) return zone.getStage();
         }
         return 0;
-    }
-
-    public static List<RadiationZone> getAllZones() {
-        return zones;
     }
 }
