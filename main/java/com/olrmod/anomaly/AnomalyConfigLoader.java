@@ -15,16 +15,26 @@ public class AnomalyConfigLoader {
 
     public static void load() {
         File file = new File(Loader.instance().getConfigDir(), "olrmod/anomalies.json");
-        if (!file.exists()) return;
+
+        if (!file.exists()) {
+            System.err.println("[AnomalyConfigLoader] Файл конфигурации не найден: " + file.getAbsolutePath());
+            return;
+        }
 
         try (Reader reader = new FileReader(file)) {
             Type type = new TypeToken<List<AnomalyDefinition>>() {}.getType();
             List<AnomalyDefinition> loaded = new Gson().fromJson(reader, type);
+
             if (loaded != null) {
                 definitions.clear();
                 definitions.addAll(loaded);
+                System.out.println("[AnomalyConfigLoader] Загружено аномалий: " + definitions.size());
+            } else {
+                System.err.println("[AnomalyConfigLoader] Конфигурация пуста или повреждена.");
             }
-        } catch (IOException e) {
+
+        } catch (Exception e) {
+            System.err.println("[AnomalyConfigLoader] Ошибка при чтении конфигурации: " + e.getMessage());
             e.printStackTrace();
         }
     }
