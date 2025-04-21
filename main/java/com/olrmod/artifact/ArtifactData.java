@@ -2,7 +2,7 @@ package com.olrmod.artifacts;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.Loader;
 
 import java.io.*;
@@ -14,7 +14,10 @@ public class ArtifactData {
 
     public static void load() {
         File file = new File(Loader.instance().getConfigDir(), "olrmod/artifacts.json");
-        if (!file.exists()) return;
+        if (!file.exists()) {
+            System.err.println("[ArtifactData] Файл конфигурации не найден: " + file.getAbsolutePath());
+            return;
+        }
 
         try (Reader reader = new FileReader(file)) {
             Type type = new TypeToken<Map<String, ArtifactType>>() {}.getType();
@@ -22,8 +25,15 @@ public class ArtifactData {
             if (loaded != null) {
                 ARTIFACTS.clear();
                 ARTIFACTS.putAll(loaded);
+                System.out.println("[ArtifactData] Загружено артефактов: " + ARTIFACTS.size());
+            } else {
+                System.err.println("[ArtifactData] Не удалось загрузить артефакты: JSON пуст");
             }
         } catch (IOException e) {
+            System.err.println("[ArtifactData] Ошибка при чтении конфигурации: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("[ArtifactData] Непредвиденная ошибка: " + e.getMessage());
             e.printStackTrace();
         }
     }
