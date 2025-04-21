@@ -9,14 +9,11 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.List;
-
 public class AnomalyLogicHandler {
-
-    private static final int EFFECT_INTERVAL = 20;
 
     @SubscribeEvent
     public void onPlayerTick(LivingEvent.LivingUpdateEvent event) {
@@ -25,7 +22,7 @@ public class AnomalyLogicHandler {
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
         World world = player.world;
 
-        if (player.ticksExisted % EFFECT_INTERVAL != 0) return;
+        if (player.ticksExisted % 20 != 0) return;
 
         BlockPos pos = player.getPosition();
         AxisAlignedBB box = new AxisAlignedBB(pos).grow(1.0D);
@@ -34,19 +31,22 @@ public class AnomalyLogicHandler {
             Block block = world.getBlockState(checkPos).getBlock();
             String id = block.getRegistryName().toString();
 
-            switch (id) {
-                case "visualmod:anomaly_burning_fuzz":
+            AnomalyDefinition def = AnomalyConfigLoader.getByBlockId(id);
+            if (def == null) continue;
+
+            switch (def.anomalyId) {
+                case "burning_fuzz":
                     EffectStageManager.addEffect(player, EffectType.CHEMICAL, 2);
-                    world.playSound(null, checkPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4F, 1F);
                     world.spawnParticle(EnumParticleTypes.FLAME, checkPos.getX() + 0.5, checkPos.getY() + 0.5, checkPos.getZ() + 0.5, 0, 0.05, 0);
+                    world.playSound(null, checkPos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.4F, 1F);
                     break;
 
-                case "visualmod:anomaly_mosquito":
+                case "mosquito":
                     pullPlayer(player, checkPos);
                     EffectStageManager.addEffect(player, EffectType.GRAVITATIONAL, 2);
                     break;
 
-                // Добавь другие аномалии по аналогии
+                // Добавляй остальные по аналогии
             }
         }
     }
@@ -57,9 +57,8 @@ public class AnomalyLogicHandler {
         double dz = anomalyPos.getZ() + 0.5 - player.posZ;
 
         double dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        double strength = 0.08;
-
         if (dist > 0.5) {
+            double strength = 0.08;
             player.motionX += (dx / dist) * strength;
             player.motionY += (dy / dist) * strength;
             player.motionZ += (dz / dist) * strength;
