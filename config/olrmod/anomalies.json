@@ -1,0 +1,14 @@
+[
+  {
+    "anomalyId": "burning_fuzz",
+    "blockIds": ["visualmod:anomaly_burning_fuzz"],
+    "biomes": ["plains", "desert"],
+    "spawnChance": 0.1
+  },
+  {
+    "anomalyId": "mosquito",
+    "blockIds": ["visualmod:anomaly_mosquito"],
+    "biomes": ["swampland", "jungle"],
+    "spawnChance": 0.05
+  }
+]
