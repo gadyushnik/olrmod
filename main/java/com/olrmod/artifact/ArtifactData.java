@@ -1,77 +1,53 @@
 package com.olrmod.artifacts;
 
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.Loader;
+
+import java.io.*;
+import java.lang.reflect.Type;
+import java.util.*;
 
 public class ArtifactData {
-    private String artifactId;
-    private ResourceLocation itemId;
-    private List<EffectEntry> effects;
-    private int spawnChance;
-    private float weightBonus;
+    private static final Map<String, ArtifactType> ARTIFACTS = new HashMap<>();
 
-    // Getters
-    public String getArtifactId() {
-        return artifactId;
+    public static void load() {
+        File file = new File(Loader.instance().getConfigDir(), "olrmod/artifacts.json");
+        if (!file.exists()) return;
+
+        try (Reader reader = new FileReader(file)) {
+            Type type = new TypeToken<Map<String, ArtifactType>>() {}.getType();
+            Map<String, ArtifactType> loaded = new Gson().fromJson(reader, type);
+            if (loaded != null) {
+                ARTIFACTS.clear();
+                ARTIFACTS.putAll(loaded);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public ResourceLocation getItemId() {
-        return itemId;
+    public static ArtifactType get(String id) {
+        return ARTIFACTS.get(id);
     }
 
-    public List<EffectEntry> getEffects() {
-        return effects;
+    public static Collection<ArtifactType> getAll() {
+        return ARTIFACTS.values();
     }
 
-    public int getSpawnChance() {
-        return spawnChance;
-    }
-
-    public float getWeightBonus() {
-        return weightBonus;
-    }
-
-    // Setters
-    public void setArtifactId(String artifactId) {
-        this.artifactId = artifactId;
-    }
-
-    public void setItemId(ResourceLocation itemId) {
-        this.itemId = itemId;
-    }
-
-    public void setEffects(List<EffectEntry> effects) {
-        this.effects = effects;
-    }
-
-    public void setSpawnChance(int spawnChance) {
-        this.spawnChance = spawnChance;
-    }
-
-    public void setWeightBonus(float weightBonus) {
-        this.weightBonus = weightBonus;
-    }
-
-    public static class EffectEntry {
-        private String type;
-        private int amount;
-
-        // Getters
-        public String getType() {
-            return type;
+    public static ArtifactType getRandomArtifact(Random rand) {
+        double totalWeight = 0;
+        for (ArtifactType type : ARTIFACTS.values()) {
+            totalWeight += type.spawnChance;
         }
 
-        public int getAmount() {
-            return amount;
+        double r = rand.nextDouble() * totalWeight;
+        for (ArtifactType type : ARTIFACTS.values()) {
+            r -= type.spawnChance;
+            if (r <= 0) return type;
         }
 
-        // Setters
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public void setAmount(int amount) {
-            this.amount = amount;
-        }
+        return null;
     }
 }
