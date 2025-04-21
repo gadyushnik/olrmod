@@ -1,7 +1,7 @@
 package com.olrmod.emission;
 
 import com.olrmod.anomaly.AnomalySpawner;
-import com.olrmod.artifacts.ArtifactConfigLoader;
+import com.olrmod.artifacts.ArtifactData;
 import com.olrmod.artifacts.ArtifactType;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.Item;
@@ -10,7 +10,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -24,8 +23,8 @@ public class EmissionManager {
 
     public static void startEmission(MinecraftServer server) {
         active = true;
-        timer = 200; // длительность выброса
-        server.getPlayerList().sendMessage(new TextComponentString("Начался выброс!"));
+        timer = 200; // Длительность выброса в тиках
+        server.getPlayerList().sendMessage(new TextComponentString("Начался выброс! Ищите укрытие."));
     }
 
     @SubscribeEvent
@@ -51,7 +50,7 @@ public class EmissionManager {
 
         for (BlockPos pos : AnomalySpawner.getAllAnomalies()) {
             if (rand.nextDouble() < 0.3) {
-                ArtifactType type = ArtifactConfigLoader.getRandomArtifact(rand);
+                ArtifactType type = ArtifactData.getRandomArtifact(rand);
                 if (type == null) continue;
 
                 Item item = ForgeRegistries.ITEMS.getValue(type.itemId);
