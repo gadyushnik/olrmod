@@ -8,11 +8,12 @@ import com.olrmod.artifacts.ArtifactTooltipHandler;
 import com.olrmod.detectors.DetectorUpdateHandler;
 import com.olrmod.effects.EffectDamageHandler;
 import com.olrmod.emission.EmissionManager;
-import com.olrmod.radiation.RadiationZoneConfig;
+import com.olrmod.radiation.RadiationSpawnConfig;
 import com.olrmod.radiation.RadiationZoneManager;
 import com.olrmod.safezone.SafeZoneManager;
 import com.olrmod.weight.WeightManager;
 import com.olrmod.armor.ArmorData;
+import com.olrmod.armor.ArmorTooltipHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -26,21 +27,20 @@ public class StalkerMod {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        // === Регистрация обработчиков ===
         MinecraftForge.EVENT_BUS.register(new EmissionManager());
         MinecraftForge.EVENT_BUS.register(new AnomalyLogicHandler());
         MinecraftForge.EVENT_BUS.register(new EffectDamageHandler());
         MinecraftForge.EVENT_BUS.register(new DetectorUpdateHandler());
         MinecraftForge.EVENT_BUS.register(new ArtifactEffectApplier());
         MinecraftForge.EVENT_BUS.register(new ArtifactTooltipHandler());
+        MinecraftForge.EVENT_BUS.register(new ArmorTooltipHandler());
         MinecraftForge.EVENT_BUS.register(new RadiationZoneManager());
         MinecraftForge.EVENT_BUS.register(new SafeZoneManager());
 
-        // === Загрузка конфигов ===
         ArtifactData.load();
         WeightManager.loadWeights(Loader.instance().getConfigDir());
         AnomalyConfigLoader.load();
-        RadiationZoneConfig.load();
-        ArmorData.load(); // Загрузка конфигурации брони
+        RadiationSpawnConfig.load();
+        ArmorData.load();
     }
 }
