@@ -1,5 +1,6 @@
 package com.olrmod.effects;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -12,7 +13,16 @@ import java.util.Map;
 
 public class EffectStageManager {
     public enum EffectType {
-        RADIATION, CHEMICAL, PSY, GRAVITATIONAL
+        RADIATION(true), CHEMICAL(true), PSY(true), GRAVITATIONAL(true),
+        ELECTRIC(false), FIRE(false); // новые эффекты без стадий
+
+        private final boolean staged;
+        EffectType(boolean staged) {
+            this.staged = staged;
+        }
+        public boolean isStaged() {
+            return staged;
+        }
     }
 
     private static final Logger LOGGER = LogManager.getLogger("OLRMod");
@@ -25,11 +35,16 @@ public class EffectStageManager {
         NBT_KEYS.put(EffectType.GRAVITATIONAL, "effect_grav");
     }
 
-    public static void addEffect(EntityPlayer player, EffectType type, int amount) {
-        if (player == null || type == null) {
-            LOGGER.warn("Attempted to add effect to null player or with null type");
+    public static void addEffect(Entity entity, EffectType type, int amount) {
+        if (!(entity instanceof EntityPlayer) || type == null) return;
+        EntityPlayer player = (EntityPlayer) entity;
+
+        if (!type.isStaged()) {
+            player.attackEntityFrom(ModDamageSources.fromType(type), amount);
+            LOGGER.debug("Applied instant {} damage: {}", type.name(), amount);
             return;
         }
+
         NBTTagCompound data = getOrCreateNBT(player);
         String key = NBT_KEYS.get(type);
         int current = data.getInteger(key);
@@ -37,22 +52,17 @@ public class EffectStageManager {
     }
 
     public static int getStage(EntityPlayer player, EffectType type) {
-        if (player == null || type == null) return 0;
+        if (player == null || type == null || !type.isStaged()) return 0;
         int value = getOrCreateNBT(player).getInteger(NBT_KEYS.get(type));
-        if (value >= 100) return 3;
-        else if (value >= 50) return 2;
-        else if (value > 0) return 1;
-        else return 0;
+        return value >= 100 ? 3 : value >= 50 ? 2 : value > 0 ? 1 : 0;
     }
 
     public static void reduceEffects(EntityPlayer player) {
         if (player == null) return;
         NBTTagCompound data = getOrCreateNBT(player);
-        for (String key : NBT_KEYS.values()) {
-            int val = data.getInteger(key);
-            if (val > 0) {
-                data.setInteger(key, Math.max(0, val - 1));
-            }
+        for (Map.Entry<EffectType, String> entry : NBT_KEYS.entrySet()) {
+            int val = data.getInteger(entry.getValue());
+            if (val > 0) data.setInteger(entry.getValue(), Math.max(0, val - 1));
         }
     }
 
@@ -71,10 +81,11 @@ public class EffectStageManager {
 
         if (player.ticksExisted % 40 == 0) {
             for (EffectType type : EffectType.values()) {
+                if (!type.isStaged()) continue;
                 int stage = getStage(player, type);
                 if (stage > 0) {
-                    LOGGER.debug("Applying {} stage {} to {}", type.name(), stage, player.getName());
                     player.attackEntityFrom(ModDamageSources.fromType(type), stage);
+                    LOGGER.debug("Stage {} damage from {} to {}", stage, type.name(), player.getName());
                 }
             }
         }
