@@ -6,7 +6,6 @@ import com.olrmod.artifacts.ArtifactData;
 import com.olrmod.artifacts.ArtifactEffectApplier;
 import com.olrmod.artifacts.ArtifactTooltipHandler;
 import com.olrmod.detectors.DetectorUpdateHandler;
-import com.olrmod.effects.EffectDamageHandler;
 import com.olrmod.emission.EmissionManager;
 import com.olrmod.radiation.RadiationSpawnConfig;
 import com.olrmod.radiation.RadiationZoneManager;
@@ -29,7 +28,6 @@ public class StalkerMod {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(new EmissionManager());
         MinecraftForge.EVENT_BUS.register(new AnomalyLogicHandler());
-        MinecraftForge.EVENT_BUS.register(new EffectDamageHandler());
         MinecraftForge.EVENT_BUS.register(new DetectorUpdateHandler());
         MinecraftForge.EVENT_BUS.register(new ArtifactEffectApplier());
         MinecraftForge.EVENT_BUS.register(new ArtifactTooltipHandler());
