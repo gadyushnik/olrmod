@@ -63,10 +63,11 @@ public class AnomalyLogicHandler {
                     break;
 
                 case "burning_fuzz":
-                    EffectStageManager.addEffect(entity, EffectType.CHEMICAL, 1);
+                    EffectStageManager.addEffect(entity, EffectType.FIRE, 1); // ← заменён эффект
                     slowEntity(entity, 0.8);
                     world.spawnParticle(EnumParticleTypes.REDSTONE, entity.posX, entity.posY, entity.posZ, 0, 0, 0);
                     break;
+
 
                 case "rusty_hair":
                     EffectStageManager.addEffect(entity, EffectType.CHEMICAL, 1);
